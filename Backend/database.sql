@@ -1,0 +1,14 @@
+CREATE DATABASE IF NOT EXISTS myproject;
+USE myproject;
+
+CREATE TABLE Patient (
+    Patient_ID CHAR(36) PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Doctor (
+    Doctor_ID CHAR(36) PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL
+);
