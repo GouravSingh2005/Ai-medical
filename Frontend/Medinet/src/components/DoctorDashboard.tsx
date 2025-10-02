@@ -4,7 +4,7 @@ import {
   Users, Calendar, Clock, AlertCircle, User, Phone, 
   Mail, Filter, Search, ToggleLeft, ToggleRight, LogOut 
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 import ThemeToggle from './ThemeToggle';
 
 interface Patient {
@@ -36,7 +36,7 @@ const DoctorDashboard: React.FC<DoctorDashboardProps> = ({ onLogout, isDark, set
       id: '1',
       name: 'Pratik Patil',
       age: 20,
-      symptoms: ['Aids', 'Fever', 'Fatigue'],
+      symptoms: ['Chest pain', 'Fever', 'Fatigue'],
       severity: 'Moderate',
       appointmentTime: 'Today 2:00 PM',
       contact: 'pratikpatil123@email.com',
@@ -54,22 +54,22 @@ const DoctorDashboard: React.FC<DoctorDashboardProps> = ({ onLogout, isDark, set
     },
     {
       id: '3',
-      name: 'Mike Davis',
-      age: 45,
+      name: 'Mohan Gawande',
+      age: 22,
       symptoms: ['Back Pain', 'Stiffness'],
       severity: 'Mild',
       appointmentTime: 'Tomorrow 10:00 AM',
-      contact: 'mike.davis@email.com',
+      contact: 'mohangawandeemail.com',
       predictedCondition: 'Musculoskeletal'
     },
     {
       id: '4',
-      name: 'Emma Wilson',
-      age: 31,
+      name: 'Amit kumar',
+      age: 20,
       symptoms: ['Nausea', 'Dizziness', 'Fatigue'],
       severity: 'Moderate',
       appointmentTime: 'Tomorrow 11:30 AM',
-      contact: 'emma.w@email.com',
+      contact: 'Amitkumar@gmail.com',
       predictedCondition: 'Gastroenteritis'
     }
   ];

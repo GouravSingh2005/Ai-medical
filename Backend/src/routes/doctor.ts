@@ -3,7 +3,7 @@ import { Router, type Request, type Response } from "express";
 import { pool } from "../db.js"; // MySQL pool
 import { z, ZodError } from "zod";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid"; // ✅ Import UUID
+import { v4 as uuidv4 } from "uuid";
 
 const DoctorRouter = Router();
 const saltRounds = 10;
@@ -35,24 +35,21 @@ DoctorRouter.post('/signup', async (req: Request, res: Response) => {
   try {
     const { email, password } = doctorSignupSchema.parse(req.body);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const doctorId = uuidv4(); // ✅ Generate UUID for Doctor_ID
+    const doctorId = uuidv4();
 
-    const [result] = await pool.query(
+    await pool.query(
       "INSERT INTO Doctor (Doctor_ID, email, password) VALUES (?, ?, ?)",
       [doctorId, email, hashedPassword]
     );
 
     res.status(201).json({
-      message: "Doctor signed up successfully",
+      message: "Signup successful",
       doctor: { doctor_id: doctorId, email }
     });
 
   } catch (err: unknown) {
     if (err instanceof ZodError) {
-      return res.status(400).json({
-        message: "Validation error",
-        errors: err.issues
-      });
+      return res.status(400).json({ message: "Validation error", errors: err.issues });
     }
     if ((err as any).code === "ER_DUP_ENTRY") {
       return res.status(409).json({ message: "Email already exists" });
@@ -62,8 +59,8 @@ DoctorRouter.post('/signup', async (req: Request, res: Response) => {
   }
 });
 
-// ✅ Signin endpoint
-DoctorRouter.post('/signin', async (req: Request, res: Response) => {
+// ✅ Signin endpoint (fixed)
+DoctorRouter.post("/signin", async (req: Request, res: Response) => {
   try {
     const { email, password } = doctorSigninSchema.parse(req.body);
 
@@ -91,12 +88,11 @@ DoctorRouter.post('/signin', async (req: Request, res: Response) => {
         email: doctor.email
       }
     });
-
   } catch (err: unknown) {
     if (err instanceof ZodError) {
       return res.status(400).json({
         message: "Validation error",
-        errors: err.issues
+        errors: err.issues,
       });
     }
     console.error(err);
