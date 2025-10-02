@@ -1,15 +1,16 @@
 // src/routes/patient.routes.ts
 import { Router, type Request, type Response } from "express";
-import { pool } from "../db.js"; // MySQL pool
+import { pool } from "../db.js"; // ✅ Use MySQL pool like DoctorRouter
 import { z, ZodError } from "zod";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid"; // ✅ UUID
+import { v4 as uuidv4 } from "uuid"; // ✅ UUID for Patient_ID
 
 const PatientRouter = Router();
 const saltRounds = 10;
 
 // Password validation schema
-const passwordSchema = z.string()
+const passwordSchema = z
+  .string()
   .min(6, "Password must be at least 6 characters")
   .refine((val) => /[A-Z]/.test(val), {
     message: "Password must contain at least one uppercase letter",
@@ -21,17 +22,17 @@ const passwordSchema = z.string()
 // Signup schema
 const patientSignupSchema = z.object({
   email: z.string().email("Invalid email"),
-  password: passwordSchema
+  password: passwordSchema,
 });
 
 // Signin schema
 const patientSigninSchema = z.object({
   email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters")
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 // ✅ Signup endpoint
-PatientRouter.post('/signup', async (req: Request, res: Response) => {
+PatientRouter.post("/signup", async (req: Request, res: Response) => {
   try {
     const { email, password } = patientSignupSchema.parse(req.body);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -46,12 +47,11 @@ PatientRouter.post('/signup', async (req: Request, res: Response) => {
       message: "Patient signed up successfully",
       patient: { patient_id: patientId, email }
     });
-
   } catch (err: unknown) {
     if (err instanceof ZodError) {
       return res.status(400).json({
         message: "Validation error",
-        errors: err.issues
+        errors: err.issues,
       });
     }
     if ((err as any).code === "ER_DUP_ENTRY") {
@@ -63,7 +63,7 @@ PatientRouter.post('/signup', async (req: Request, res: Response) => {
 });
 
 // ✅ Signin endpoint
-PatientRouter.post('/signin', async (req: Request, res: Response) => {
+PatientRouter.post("/signin", async (req: Request, res: Response) => {
   try {
     const { email, password } = patientSigninSchema.parse(req.body);
 
@@ -91,12 +91,11 @@ PatientRouter.post('/signin', async (req: Request, res: Response) => {
         email: patient.email
       }
     });
-
   } catch (err: unknown) {
     if (err instanceof ZodError) {
       return res.status(400).json({
         message: "Validation error",
-        errors: err.issues
+        errors: err.issues,
       });
     }
     console.error(err);
