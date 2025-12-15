@@ -136,7 +136,7 @@ OPENAI_MODEL=gpt-4o-mini
 # ============================================
 # Google Maps Configuration
 # ============================================
-GOOGLE_MAPS_API_KEY=AIzaSyABCDEFGHIJKLMNOPQRSTUVWXYZ1234567
+GOOGLE_MAPS_API_KEY=000000000000
 
 # ============================================
 # Email Configuration (Gmail)
