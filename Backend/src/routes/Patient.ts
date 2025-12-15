@@ -23,6 +23,10 @@ const passwordSchema = z
 const patientSignupSchema = z.object({
   email: z.string().email("Invalid email"),
   password: passwordSchema,
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  phone: z.string().optional(),
+  age: z.number().int().positive().optional(),
+  gender: z.enum(['Male', 'Female', 'Other']).optional(),
 });
 
 // Signin schema
@@ -34,18 +38,18 @@ const patientSigninSchema = z.object({
 // ✅ Signup endpoint
 PatientRouter.post("/signup", async (req: Request, res: Response) => {
   try {
-    const { email, password } = patientSignupSchema.parse(req.body);
+    const { email, password, name, phone, age, gender } = patientSignupSchema.parse(req.body);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const patientId = uuidv4(); // ✅ Generate UUID for Patient_ID
 
     const [result] = await pool.query(
-      "INSERT INTO Patient (Patient_ID, email, password) VALUES (?, ?, ?)",
-      [patientId, email, hashedPassword]
+      "INSERT INTO Patient (Patient_ID, email, password, name, phone, age, gender) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [patientId, email, hashedPassword, name, phone || null, age || null, gender || null]
     );
 
     res.status(201).json({
       message: "Patient signed up successfully",
-      patient: { patient_id: patientId, email }
+      patient: { patient_id: patientId, email, name }
     });
   } catch (err: unknown) {
     if (err instanceof ZodError) {
@@ -88,7 +92,11 @@ PatientRouter.post("/signin", async (req: Request, res: Response) => {
       message: "Signin successful",
       patient: {
         patient_id: patient.Patient_ID,
-        email: patient.email
+        email: patient.email,
+        name: patient.name,
+        phone: patient.phone,
+        age: patient.age,
+        gender: patient.gender
       }
     });
   } catch (err: unknown) {

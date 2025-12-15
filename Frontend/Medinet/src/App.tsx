@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
-import PatientDashboard from './components/PatientDashboard';
+import PatientDashboardSimple from './components/PatientDashboardSimple';
 import BookingCalendar from './components/BookingCalendar';
 import DoctorDashboard from './components/DoctorDashboard';
+import { ConsultationPage } from './components/ConsultationPage';
 
 export type UserType = 'patient' | 'doctor' | null;
 
@@ -24,10 +25,11 @@ const AppContent: React.FC = () => {
   const handleLogout = () => {
     setUserType(null);
     setIsLoggedIn(false);
+    localStorage.removeItem('userData');
   };
 
   // Don't show navbar on dashboard pages for cleaner experience
-  const showNavbar = !location.pathname.includes('dashboard') && !location.pathname.includes('booking');
+  const showNavbar = !location.pathname.includes('dashboard') && !location.pathname.includes('booking') && !location.pathname.includes('consultation');
 
   return (
     <div className={isDark ? 'dark' : ''}>
@@ -65,7 +67,7 @@ const AppContent: React.FC = () => {
               path="/patient-dashboard" 
               element={
                 isLoggedIn && userType === 'patient' ? (
-                  <PatientDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />
+                  <PatientDashboardSimple onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />
                 ) : (
                   <Navigate to="/patient-login" replace />
                 )
@@ -88,6 +90,22 @@ const AppContent: React.FC = () => {
                   <DoctorDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />
                 ) : (
                   <Navigate to="/doctor-login" replace />
+                )
+              } 
+            />
+            <Route 
+              path="/consultation" 
+              element={
+                isLoggedIn && userType === 'patient' ? (
+                  <ConsultationPage 
+                    patientId={JSON.parse(localStorage.getItem('userData') || '{}').patient_id || ''} 
+                    patientName={JSON.parse(localStorage.getItem('userData') || '{}').name || 'Patient'}
+                    isDark={isDark}
+                    setIsDark={setIsDark}
+                    onLogout={handleLogout}
+                  />
+                ) : (
+                  <Navigate to="/patient-login" replace />
                 )
               } 
             />

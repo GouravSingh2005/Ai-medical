@@ -1,9 +1,7 @@
 // src/components/LoginPage.tsx
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const backendUrl = "http://localhost:3001";
+import { patientAPI, doctorAPI } from "../utils/api";
 
 interface LoginPageProps {
   userType?: "patient" | "doctor";
@@ -16,6 +14,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType: defaultUserType, onLogi
   const [userType, setUserType] = useState<"patient" | "doctor">(defaultUserType || "patient");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [specialty, setSpecialty] = useState("");
+  const [experienceYears, setExperienceYears] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -25,8 +27,35 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType: defaultUserType, onLogi
     setMessages([]);
 
     try {
-      const endpoint = `/${userType}/${isSignup ? "signup" : "signin"}`;
-      const response = await axios.post(`${backendUrl}${endpoint}`, { email, password });
+      let response;
+      
+      if (userType === "patient") {
+        if (isSignup) {
+          response = await patientAPI.signup({ 
+            email, 
+            password, 
+            name, 
+            phone: phone || undefined,
+            age: undefined,
+            gender: undefined
+          });
+        } else {
+          response = await patientAPI.signin({ email, password });
+        }
+      } else {
+        if (isSignup) {
+          response = await doctorAPI.signup({ 
+            email, 
+            password, 
+            name, 
+            specialty, 
+            phone: phone || undefined, 
+            experience_years: experienceYears ? parseInt(experienceYears) : undefined 
+          });
+        } else {
+          response = await doctorAPI.signin({ email, password });
+        }
+      }
 
       if (response.status === 201 || response.status === 200) {
         // ✅ Show success message
@@ -97,6 +126,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType: defaultUserType, onLogi
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignup && (
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={loading}
+              className="w-full p-3 border rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 bg-white dark:bg-slate-700"
+            />
+          )}
           <input
             type="email"
             placeholder="Email"
@@ -115,6 +155,41 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType: defaultUserType, onLogi
             disabled={loading}
             className="w-full p-3 border rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 bg-white dark:bg-slate-700"
           />
+          {isSignup && (
+            <>
+              <input
+                type="tel"
+                placeholder="Phone (optional)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={loading}
+                className="w-full p-3 border rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 bg-white dark:bg-slate-700"
+              />
+              {userType === "doctor" && (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Specialty (e.g., Cardiology)"
+                    value={specialty}
+                    onChange={(e) => setSpecialty(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="w-full p-3 border rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 bg-white dark:bg-slate-700"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Years of Experience"
+                    value={experienceYears}
+                    onChange={(e) => setExperienceYears(e.target.value)}
+                    min="0"
+                    max="70"
+                    disabled={loading}
+                    className="w-full p-3 border rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 bg-white dark:bg-slate-700"
+                  />
+                </>
+              )}
+            </>
+          )}
           <button
             type="submit"
             disabled={loading}

@@ -21,7 +21,11 @@ const passwordSchema = z.string()
 // Signup schema
 const doctorSignupSchema = z.object({
   email: z.string().email("Invalid email"),
-  password: passwordSchema
+  password: passwordSchema,
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  specialty: z.string().min(2, "Specialty is required"),
+  phone: z.string().optional(),
+  experience_years: z.number().int().nonnegative().optional(),
 });
 
 // Signin schema
@@ -33,18 +37,18 @@ const doctorSigninSchema = z.object({
 // ✅ Signup endpoint
 DoctorRouter.post('/signup', async (req: Request, res: Response) => {
   try {
-    const { email, password } = doctorSignupSchema.parse(req.body);
+    const { email, password, name, specialty, phone, experience_years } = doctorSignupSchema.parse(req.body);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const doctorId = uuidv4();
 
     await pool.query(
-      "INSERT INTO Doctor (Doctor_ID, email, password) VALUES (?, ?, ?)",
-      [doctorId, email, hashedPassword]
+      "INSERT INTO Doctor (Doctor_ID, email, password, name, specialty, phone, experience_years) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [doctorId, email, hashedPassword, name, specialty, phone || null, experience_years || null]
     );
 
     res.status(201).json({
       message: "Signup successful",
-      doctor: { doctor_id: doctorId, email }
+      doctor: { doctor_id: doctorId, email, name, specialty }
     });
 
   } catch (err: unknown) {
@@ -85,7 +89,12 @@ DoctorRouter.post("/signin", async (req: Request, res: Response) => {
       message: "Signin successful",
       doctor: {
         doctor_id: doctor.Doctor_ID,
-        email: doctor.email
+        email: doctor.email,
+        name: doctor.name,
+        specialty: doctor.specialty,
+        phone: doctor.phone,
+        experience_years: doctor.experience_years,
+        availability_status: doctor.availability_status
       }
     });
   } catch (err: unknown) {
