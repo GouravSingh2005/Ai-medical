@@ -130,7 +130,7 @@ DB_NAME=medical_ai_system
 # ============================================
 # OpenAI Configuration
 # ============================================
-OPENAI_API_KEY=sk-proj-AbCdEfGhIjKlMnOpQrStUvWxYz1234567890
+OPENAI_API_KEY=0000000000000000000000000000000000
 OPENAI_MODEL=gpt-4o-mini
 
 # ============================================
