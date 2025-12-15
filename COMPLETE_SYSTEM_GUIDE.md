@@ -110,7 +110,7 @@ DB_PASSWORD=medical_pass
 DB_NAME=myproject
 DB_PORT=3306
 
-GEMINI_API_KEY=AIzaSyC7uoeHj_hFqil5FmYcO_dMm9-ncdxqM5k
+GEMINI_API_KEY=AIzzzzzzzzzzzzzzzzzzzzzzzzzzz
 
 PORT=3001
 NODE_ENV=development
